@@ -1,1 +1,47 @@
-<p>todo-list works!</p>
+<mat-tab-group>
+  <mat-tab label="All">
+    <mat-list>
+      @for (todo of todos(); track todo.id) {
+        <mat-list-item>
+          <mat-checkbox [(ngModel)]="todo.completed">
+            {{ todo.description }}
+          </mat-checkbox>
+        </mat-list-item>
+      }
+    </mat-list>
+  </mat-tab>
+
+  <mat-tab label="Active">
+    <mat-list>
+      @for (todo of todos(); track todo.id) {
+        @if (!todo.completed) {
+          <mat-list-item>
+            <mat-checkbox [(ngModel)]="todo.completed">
+              {{ todo.description }}
+            </mat-checkbox>
+          </mat-list-item>
+        }
+      }
+    </mat-list>
+  </mat-tab>
+
+  <mat-tab label="Completed">
+    <mat-list>
+      @for (todo of todos(); track todo.id) {
+        @if (todo.completed) {
+          <mat-list-item>
+            <mat-checkbox [(ngModel)]="todo.completed">
+              {{ todo.description }}
+            </mat-checkbox>
+          </mat-list-item>
+        }
+      }
+    </mat-list>
+
+    <mat-list-item>
+      <button mat-stroked-button >
+        Delete all completed
+      </button>
+    </mat-list-item>
+  </mat-tab>
+</mat-tab-group>
