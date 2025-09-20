@@ -3,7 +3,13 @@
 <form [formGroup]="form" class="form">
   <mat-form-field appearance="fill" class="full-width">
     <mat-label>Description</mat-label>
-    <input matInput formControlName="description">
+    <input matInput formControlName="description" aria-label="Todo description">
+    @if (form.get('description')?.hasError('required')) {
+      <mat-error>Description is required.</mat-error>
+    }
+    @else if (form.get('description')?.hasError('minlength')) {
+      <mat-error>Must be at least 3 characters long.</mat-error>
+    }
   </mat-form-field>
 
   <mat-form-field appearance="fill" class="full-width">

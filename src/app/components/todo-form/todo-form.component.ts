@@ -6,6 +6,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatButtonModule } from '@angular/material/button';
+
 import { Todo } from '../../models/todo.model';
 
 @Component({
@@ -26,7 +27,7 @@ import { Todo } from '../../models/todo.model';
 })
 export class TodoFormComponent {
   form = this.formBuilder.group({
-    description: ['', Validators.required],
+    description: ['', [Validators.required, Validators.minLength(3)]],
     dueDate: [null as Date | null, Validators.required]
   });
 

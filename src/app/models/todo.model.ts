@@ -5,4 +5,5 @@ export interface Todo {
   dueDate: string | null;
   completed: boolean;
   completionDate?: string | null;
+  loading?: boolean;
 }

@@ -1,6 +1,5 @@
-import { Component, signal } from '@angular/core';
+import { Component, computed, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatCardModule } from '@angular/material/card'; 
 import { MatListModule } from '@angular/material/list';
@@ -9,10 +8,12 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 import { TodoService } from '../../services/todo.service';
 import { Todo } from '../../models/todo.model';
 import { TodoFormComponent } from '../../components/todo-form/todo-form.component';
+import { TodoTabComponent } from "../../components/todo-tab/todo-tab.component";
 import { TodoItemComponent } from "../../components/todo-item/todo-item.component";
 
 @Component({
@@ -26,13 +27,24 @@ import { TodoItemComponent } from "../../components/todo-item/todo-item.componen
     MatButtonModule,
     MatIconModule,
     FormsModule,
-    TodoItemComponent
+    TodoTabComponent,
+    TodoItemComponent,
+    MatProgressSpinnerModule
 ],
   templateUrl: './todo-list.component.html',
   styleUrls: ['./todo-list.component.scss']
 })
 export class TodoListComponent {
   todos = signal<Todo[]>([]);
+  completedTodos = computed(() => this.todos().filter(todo => todo.completed));
+  activeTodos = computed(() => this.todos().filter(todo => !todo.completed));
+  loading = signal(false);
+
+  private replaceTodo(updated: Todo) {
+    this.todos.update(list =>
+      list.map(todo => todo.id === updated.id ? updated : todo)
+    );
+  }
 
   constructor(
     private dialog: MatDialog,
@@ -42,13 +54,6 @@ export class TodoListComponent {
   
   ngOnInit() {
     this.loadTodos();
-  }
-  
-  loadTodos() {
-    this.todoService.getTodos().subscribe({
-      next: (data) => this.todos.set(data),
-      error: () => this.snackBar.open('Failed to load todos', 'Close', { duration: 2000 })
-    });
   }
   
   openForm(todo?: Todo) {
@@ -67,9 +72,7 @@ export class TodoListComponent {
             dueDate: result.dueDate
           }).subscribe({
             next: (updated) => {
-              this.todos.update(list =>
-                list.map(t => t.id === updated.id ? updated : t)
-              );
+              this.replaceTodo(updated);
               this.snackBar.open('Todo updated', 'Close', { duration: 2000 });
             },
             error: () => this.snackBar.open('Failed to update todo', 'Close', { duration: 2000 })
@@ -95,43 +98,72 @@ export class TodoListComponent {
     });
   }
   
-  delete(todo: Todo) {
-    this.todoService.deleteTodo(todo.id!).subscribe({
+  delete(todoToDelete: Todo) {
+    const prev = [...this.todos()];
+  
+    this.todos.update(list =>
+      list.filter(existingTodo => existingTodo.id !== todoToDelete.id)
+    );
+  
+    this.todoService.deleteTodo(todoToDelete.id!).subscribe({
       next: () => {
-        this.todos.update(list => list.filter(t => t.id !== todo.id));
-        this.snackBar.open('Todo deleted', 'Close', { duration: 2000 });
+        this.snackBar.open('Todo deleted ✅', 'Close', { duration: 2000 });
       },
-      error: () => this.snackBar.open('Failed to delete todo', 'Close', { duration: 2000 })
+      error: () => {
+        // ❌ Rollback if API fails
+        this.todos.set(prev);
+  
+        this.snackBar.open('Failed to delete todo ❌', 'Retry', { duration: 3000 })
+          .onAction()
+          .subscribe(() => this.delete(todoToDelete));
+      }
     });
   }
   
+
   deleteAllCompleted() {
-    this.todoService.deleteAllCompleted(this.todos()).subscribe({
-      next: () => {
-        this.todos.update(list => list.filter(t => !t.completed));
-        this.snackBar.open('All completed todos deleted', 'Close', { duration: 2000 });
-      },
-      error: () => this.snackBar.open('Failed to delete completed todos', 'Close', { duration: 2000 })
+    const prev = [...this.todos()];
+    this.todoService.deleteAllCompleted(this.completedTodos()).subscribe({
+      next: () => this.todos.update(list => list.filter(t => !t.completed)),
+      error: () => {
+        this.todos.set(prev);
+        this.snackBar.open('Failed to delete completed todos', 'Close', { duration: 2000 });
+      }
     });
   }
 
   onToggle(e: { id: string; completed: boolean }) {
-    const current = this.todos().find(t => t.id === e.id);
+    const current = this.todos().find(todo => todo.id === e.id);
     if (!current) return;
   
-    const updated: Partial<Todo> = {
+    const updated: Todo = {
       ...current,
       completed: e.completed,
-      completionDate: e.completed ? (current.completionDate ?? new Date().toISOString()) : null
+      completionDate: e.completed ? new Date().toISOString() : null
     };
   
+    this.replaceTodo(updated);
+
     this.todoService.updateTodo(e.id, updated).subscribe({
-      next: (saved) => {
-        this.todos.update(list =>
-          list.map(t => t.id === saved.id ? saved : t)
-        );
+      next: (saved) => this.replaceTodo(saved),
+      error: () => {
+        this.replaceTodo(current);
+        this.snackBar.open('Failed to update todo ❌', 'Close', { duration: 2000 });
+      }
+    });
+  }
+  
+  loadTodos() {
+    this.loading.set(true);
+    this.todoService.getTodos().subscribe({
+      next: (data) => {
+        this.todos.set(data);
+        this.loading.set(false);
       },
-      error: () => this.snackBar.open('Failed to update todo', 'Close', { duration: 2000 })
+      error: () => {
+        this.snackBar.open('Failed to load todos', 'Close', { duration: 2000 });
+        this.loading.set(false);
+      }
     });
   }
 }

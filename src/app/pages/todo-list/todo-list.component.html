@@ -1,58 +1,81 @@
-<mat-tab-group>
+@if (loading()) {
+  <div class="loading">
+    <mat-progress-spinner
+      mode="indeterminate"
+      diameter="40">
+    </mat-progress-spinner>
+  </div>
+} @else {
+  <mat-tab-group>
   <mat-tab label="All">
-    <mat-list>
-      @for (todo of todos(); track todo.id) {
-        <app-todo-item
-          [todo]="todo"
-          (edit)="openForm(todo)"
-          (remove)="delete(todo)"
-          (toggleCompleted)="onToggle($event)">
-        </app-todo-item>
-      }
-    </mat-list>
+    @if (todos().length === 0) {
+      <div class="empty-state">
+        <p>No todos yet. Create your first one! 🚀</p>
+      </div>
+    } @else {
+      <app-todo-tab
+        [todos]="todos()"
+        filter="all"
+        (editTodo)="openForm($event)"
+        (removeTodo)="delete($event)"
+        (toggleTodoCompleted)="onToggle($event)">
+      </app-todo-tab>
+    }
   </mat-tab>
 
   <mat-tab label="Active">
-    <mat-list>
-      @for (todo of todos(); track todo.id) {
-        @if (!todo.completed) {
-          <app-todo-item
-            [todo]="todo"
-            (edit)="openForm(todo)"
-            (remove)="delete(todo)"
-            (toggleCompleted)="onToggle($event)">
-          </app-todo-item>
-        }
-      }
-    </mat-list>
+    @if (todos().length === 0) {
+      <div class="empty-state">
+        <p>No todos yet. Create your first one! 🚀</p>
+      </div>
+    } @else if (activeTodos().length === 0) {
+      <div class="empty-state">
+        <p>Looks like you finished all your todos! Good job! 🎉</p>
+      </div>
+    } @else {
+      <app-todo-tab
+        [todos]="todos()"
+        filter="active"
+        (editTodo)="openForm($event)"
+        (removeTodo)="delete($event)"
+        (toggleTodoCompleted)="onToggle($event)">
+      </app-todo-tab>
+    }
   </mat-tab>
 
   <mat-tab label="Completed">
     <mat-list>
-      @for (todo of todos(); track todo.id) {
-        @if (todo.completed) {
-          <app-todo-item
-            [todo]="todo"
-            (edit)="openForm(todo)"
-            (remove)="delete(todo)"
-            (toggleCompleted)="onToggle($event)"> 
-          </app-todo-item>
+      @if (completedTodos().length > 0) {
+        @for (todo of todos(); track todo.id) {
+          @if (todo.completed) {
+            <app-todo-item
+              [todo]="todo"
+              (editTodo)="openForm(todo)"
+              (removeTodo)="delete(todo)"
+              (toggleTodoCompleted)="onToggle($event)"> 
+            </app-todo-item>
+            <mat-divider></mat-divider>
+          }
         }
-      }
-
-      <mat-list-item class="delete-all-btn">
-        <div matListItemMeta>
-          <button mat-stroked-button color="primary" (click)="deleteAllCompleted()">
-            <mat-icon>delete</mat-icon>
-            Delete all completed
-          </button>
+  
+        <mat-list-item class="delete-all-btn">
+          <div matListItemMeta>
+            <button mat-stroked-button color="primary" (click)="deleteAllCompleted()">
+              <mat-icon>delete</mat-icon>
+              Delete all completed
+            </button>
+          </div>
+        </mat-list-item>
+      } @else {
+        <div class="empty-state">
+          <p>No completed todos yet, but you can do it — step by step! 💪</p>
         </div>
-      </mat-list-item>
+      }
     </mat-list>
   </mat-tab>
 </mat-tab-group>
 
-
 <button mat-fab color="primary" class="add-btn" (click)="openForm()">
   <mat-icon>add</mat-icon>
 </button>
+}

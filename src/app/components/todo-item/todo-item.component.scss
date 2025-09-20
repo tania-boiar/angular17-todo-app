@@ -1,0 +1,23 @@
+.meta {
+  font-size: 13px;
+  color: #666;
+  margin-top: 2px;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.due-date {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #555;
+  margin-right: 0.5rem;
+}
+
+.todo-text {
+  display: flex;
+  flex-direction: column;
+}

@@ -1,0 +1,22 @@
+<mat-list>
+  @for (todo of filteredTodos(); track todo.id) {
+    <app-todo-item
+      [todo]="todo"
+      (editTodo)="editTodo.emit(todo)"
+      (removeTodo)="removeTodo.emit(todo)"
+      (toggleTodoCompleted)="toggleTodoCompleted.emit($event)">
+    </app-todo-item>
+    <mat-divider></mat-divider>
+  }
+
+  @if (filter() === 'completed' && filteredTodos().length > 0) {
+    <mat-list-item class="delete-all-btn">
+      <div matListItemMeta>
+        <button mat-stroked-button color="warn" (click)="deleteCompletedTodos.emit()">
+          <mat-icon>delete</mat-icon>
+          Delete all completed
+        </button>
+      </div>
+    </mat-list-item>
+  }
+</mat-list>
