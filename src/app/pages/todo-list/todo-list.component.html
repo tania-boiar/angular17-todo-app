@@ -5,7 +5,8 @@
         <app-todo-item
           [todo]="todo"
           (edit)="openForm(todo)"
-          (remove)="delete(todo)">
+          (remove)="delete(todo)"
+          (toggleCompleted)="onToggle($event)">
         </app-todo-item>
       }
     </mat-list>
@@ -18,7 +19,8 @@
           <app-todo-item
             [todo]="todo"
             (edit)="openForm(todo)"
-            (remove)="delete(todo)">
+            (remove)="delete(todo)"
+            (toggleCompleted)="onToggle($event)">
           </app-todo-item>
         }
       }
@@ -32,7 +34,8 @@
           <app-todo-item
             [todo]="todo"
             (edit)="openForm(todo)"
-            (remove)="delete(todo)">
+            (remove)="delete(todo)"
+            (toggleCompleted)="onToggle($event)"> 
           </app-todo-item>
         }
       }

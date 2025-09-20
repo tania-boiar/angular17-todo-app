@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, input, output } from '@angular/core';
 import { Todo } from '../../models/todo.model';
 import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -10,21 +10,36 @@ import { MatListModule } from '@angular/material/list';
 @Component({
   selector: 'app-todo-item',
   standalone: true,
-  imports: [FormsModule, DatePipe, MatCheckboxModule, MatIconModule, MatButtonModule, MatListModule],
+  imports: [
+    FormsModule,
+    DatePipe,
+    MatCheckboxModule,
+    MatIconModule,
+    MatButtonModule,
+    MatListModule
+  ],
   templateUrl: './todo-item.component.html',
   styleUrls: ['./todo-item.component.scss']
 })
 export class TodoItemComponent {
-  @Input() todo!: Todo;
+  todo = input.required<Todo>();
 
-  @Output() edit = new EventEmitter<Todo>();
-  @Output() remove = new EventEmitter<Todo>();
+  edit = output<Todo>();
+  remove = output<Todo>();
+  toggleCompleted = output<{ id: string; completed: boolean }>();
 
   onEdit() {
-    this.edit.emit(this.todo);
+    this.edit.emit(this.todo());
   }
 
   onDelete() {
-    this.remove.emit(this.todo);
+    this.remove.emit(this.todo());
+  }
+
+  onToggle(completed: boolean) {
+    this.toggleCompleted.emit({
+      id: this.todo().id!,
+      completed
+    });
   }
 }

@@ -114,4 +114,24 @@ export class TodoListComponent {
       error: () => this.snackBar.open('Failed to delete completed todos', 'Close', { duration: 2000 })
     });
   }
+
+  onToggle(e: { id: string; completed: boolean }) {
+    const current = this.todos().find(t => t.id === e.id);
+    if (!current) return;
+  
+    const updated: Partial<Todo> = {
+      ...current,
+      completed: e.completed,
+      completionDate: e.completed ? (current.completionDate ?? new Date().toISOString()) : null
+    };
+  
+    this.todoService.updateTodo(e.id, updated).subscribe({
+      next: (saved) => {
+        this.todos.update(list =>
+          list.map(t => t.id === saved.id ? saved : t)
+        );
+      },
+      error: () => this.snackBar.open('Failed to update todo', 'Close', { duration: 2000 })
+    });
+  }
 }
