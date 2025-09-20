@@ -4,6 +4,10 @@ A Todo List application built with Angular 17 and Angular Material.
 This project demonstrates the use of Angular’s newest features like Signals, the @if / @for template syntax, error handling with rollback, and a clean modular component structure.
 Todos are stored in a MockAPI backend, with full CRUD support.
 
+## Demo
+Check out the live app here:  
+👉 [Angular17TodoApp Demo](https://tania-boiar.github.io/angular17-todo-app/)
+
 ## Tech Stack
 * Angular 17 (standalone components + Signals API)
 * Angular Material (tabs, dialogs, buttons, icons, spinners)
@@ -46,12 +50,12 @@ cd angular17-todo-app
 
 
 ### Endpoints
-**GET** /todos → fetch all todos
-**GET** /todos/:id → fetch single todo
-**POST** /todos → create new todo
-**PUT** /todos/:id → update todo
-**DELETE** /todos/:id → delete todo
-**Bulk delete completed** → parallel delete requests
+- **GET** /todos → fetch all todos
+- **GET** /todos/:id → fetch single todo
+- **POST** /todos → create new todo
+- **PUT** /todos/:id → update todo
+- **DELETE** /todos/:id → delete todo
+- **Bulk delete completed** → parallel delete requests
 
 ## API Documentation
 
