@@ -27,7 +27,7 @@ import { Todo } from '../../models/todo.model';
 export class TodoFormComponent {
   form = this.formBuilder.group({
     description: ['', Validators.required],
-    dueDate: ['', Validators.required]
+    dueDate: [null as Date | null, Validators.required]
   });
 
   constructor(
@@ -35,14 +35,28 @@ export class TodoFormComponent {
     private dialogRef: MatDialogRef<TodoFormComponent, Todo>,
     @Inject(MAT_DIALOG_DATA) public data: Todo | null
   ) {
-    if (data) {
-      this.form.patchValue(data);
+      if (data) {
+      this.form.patchValue({
+        ...data,
+        dueDate: data.dueDate ? new Date(data.dueDate) : null
+      });
     }
   }
 
   save() {
     if (this.form.valid) {
-      this.dialogRef.close(this.form.value as Todo);
+      const raw = this.form.value;
+  
+      const todo: Todo = {
+        id: this.data?.id,
+        description: raw.description ?? '',
+        dueDate: raw.dueDate ? new Date(raw.dueDate).toISOString() : null, // ✅ convert back
+        creationDate: this.data?.creationDate ?? new Date().toISOString(),
+        completed: this.data?.completed ?? false,
+        completionDate: this.data?.completionDate ?? null
+      };
+  
+      this.dialogRef.close(todo);
     }
   }
 

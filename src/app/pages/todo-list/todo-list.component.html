@@ -1,117 +1,54 @@
 <mat-tab-group>
   <mat-tab label="All">
-    <mat-list class="list-container">
+    <mat-list>
       @for (todo of todos(); track todo.id) {
-        <mat-list-item>
-          <mat-checkbox [(ngModel)]="todo.completed">
-            <div>{{ todo.description }}</div>
-            <div class="meta">
-              Created: {{ todo.creationDate | date:'mediumDate' }}
-              @if (todo.completionDate) {
-                • Completed: {{ todo.completionDate | date:'mediumDate' }}
-              }
-            </div>
-          </mat-checkbox>
-
-          <div matListItemMeta class="actions">
-            <span class="due-date">
-              Due: {{ todo.dueDate | date:'mediumDate' }}
-            </span>
-
-            <button mat-icon-button color="primary" class="edit-icon" (click)="openForm(todo)">
-              <mat-icon>edit</mat-icon>
-            </button>
-
-            <button mat-icon-button class="small-icon" (click)="delete(todo)">
-              <mat-icon>delete</mat-icon>
-            </button>
-          </div>
-        </mat-list-item>
+        <app-todo-item
+          [todo]="todo"
+          (edit)="openForm(todo)"
+          (remove)="delete(todo)">
+        </app-todo-item>
       }
     </mat-list>
   </mat-tab>
 
-  <!-- Active tab -->
   <mat-tab label="Active">
-    <mat-list class="list-container">
+    <mat-list>
       @for (todo of todos(); track todo.id) {
         @if (!todo.completed) {
-          <mat-list-item>
-            <mat-checkbox [(ngModel)]="todo.completed">
-              <div>{{ todo.description }}</div>
-              <div class="meta">
-                Created: {{ todo.creationDate | date:'mediumDate' }}
-                @if (todo.completionDate) {
-                  • Completed: {{ todo.completionDate | date:'mediumDate' }}
-                }
-              </div>
-            </mat-checkbox>
-
-            <div matListItemMeta class="actions">
-              <span class="due-date">
-                Due: {{ todo.dueDate | date:'mediumDate' }}
-              </span>
-
-              <button mat-icon-button color="primary" class="edit-icon" (click)="openForm(todo)">
-                <mat-icon>edit</mat-icon>
-              </button>
-
-              <button mat-icon-button class="small-icon" (click)="delete(todo)">
-                <mat-icon>delete</mat-icon>
-              </button>
-            </div>
-          </mat-list-item>
+          <app-todo-item
+            [todo]="todo"
+            (edit)="openForm(todo)"
+            (remove)="delete(todo)">
+          </app-todo-item>
         }
       }
     </mat-list>
   </mat-tab>
 
-  <!-- Completed tab -->
   <mat-tab label="Completed">
-    <mat-list class="list-container">
-        @for (todo of todos(); track todo.id) {
-          @if (todo.completed) {
-            <mat-list-item>
-              <mat-checkbox [(ngModel)]="todo.completed">
-                <div>{{ todo.description }}</div>
-                <div class="meta">
-                  Created: {{ todo.creationDate | date:'mediumDate' }}
-                  @if (todo.completionDate) {
-                    • Completed: {{ todo.completionDate | date:'mediumDate' }}
-                  }
-                </div>
-              </mat-checkbox>
-
-              <div matListItemMeta class="actions">
-                <span class="due-date">
-                  Due: {{ todo.dueDate | date:'mediumDate' }}
-                </span>
-
-                <button mat-icon-button color="primary" class="edit-icon" (click)="openForm(todo)">
-                  <mat-icon>edit</mat-icon>
-                </button>
-
-                <button mat-icon-button class="small-icon" (click)="delete(todo)">
-                  <mat-icon>delete</mat-icon>
-                </button>
-              </div>
-            </mat-list-item>
-          }
+    <mat-list>
+      @for (todo of todos(); track todo.id) {
+        @if (todo.completed) {
+          <app-todo-item
+            [todo]="todo"
+            (edit)="openForm(todo)"
+            (remove)="delete(todo)">
+          </app-todo-item>
         }
-    
-    
-        <mat-list-item class="delete-all-btn">
-          <div matListItemMeta>
-            <button mat-stroked-button color="primary" (click)="deleteAllCompleted()">
-              <mat-icon>delete</mat-icon>
-              Delete all completed
-            </button>
-          </div>
-        </mat-list-item>
-    </mat-list>
+      }
 
+      <mat-list-item class="delete-all-btn">
+        <div matListItemMeta>
+          <button mat-stroked-button color="primary" (click)="deleteAllCompleted()">
+            <mat-icon>delete</mat-icon>
+            Delete all completed
+          </button>
+        </div>
+      </mat-list-item>
+    </mat-list>
   </mat-tab>
 </mat-tab-group>
+
 
 <button mat-fab color="primary" class="add-btn" (click)="openForm()">
   <mat-icon>add</mat-icon>

@@ -1,1 +1,25 @@
-<p>todo-item works!</p>
+<mat-list-item>
+  <mat-checkbox [(ngModel)]="todo.completed">
+    <div>{{ todo.description }}</div>
+    <div class="meta">
+      Created: {{ todo.creationDate | date:'mediumDate' }}
+      @if (todo.completionDate) {
+        • Completed: {{ todo.completionDate | date:'mediumDate' }}
+      }
+    </div>
+  </mat-checkbox>
+
+  <div matListItemMeta class="actions">
+    <span class="due-date">
+      Due: {{ todo.dueDate | date:'mediumDate' }}
+    </span>
+
+    <button mat-icon-button color="primary" (click)="onEdit()">
+      <mat-icon>edit</mat-icon>
+    </button>
+
+    <button mat-icon-button color="warn" (click)="onDelete()">
+      <mat-icon>delete</mat-icon>
+    </button>
+  </div>
+</mat-list-item>

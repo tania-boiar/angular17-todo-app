@@ -1,6 +1,5 @@
 import { Component, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { DatePipe } from '@angular/common';
 
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatCardModule } from '@angular/material/card'; 
@@ -11,8 +10,10 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
+import { TodoService } from '../../services/todo.service';
 import { Todo } from '../../models/todo.model';
 import { TodoFormComponent } from '../../components/todo-form/todo-form.component';
+import { TodoItemComponent } from "../../components/todo-item/todo-item.component";
 
 @Component({
   selector: 'app-todo-list',
@@ -25,93 +26,92 @@ import { TodoFormComponent } from '../../components/todo-form/todo-form.componen
     MatButtonModule,
     MatIconModule,
     FormsModule,
-    DatePipe
-  ],
+    TodoItemComponent
+],
   templateUrl: './todo-list.component.html',
   styleUrls: ['./todo-list.component.scss']
 })
 export class TodoListComponent {
-  todos = signal<Todo[]>([
-    {
-      id: '1',
-      description: 'Complete the Angular 17 Todo App',
-      creationDate: '2025-09-20',
-      dueDate: '2025-09-22',
-      completed: false
-    },
-    {
-      id: '2',
-      description: 'Prepare the first part of theory',
-      creationDate: '2025-09-20',
-      dueDate: '2025-09-22',
-      completed: true,
-      completionDate: '2025-09-21'
-    },
-    {
-      id: '3',
-      description: 'Prepare the second part of theory',
-      creationDate: '2025-09-20',
-      dueDate: '2025-10-06',
-      completed: false
-    }
-  ]);
+  todos = signal<Todo[]>([]);
 
   constructor(
     private dialog: MatDialog,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private todoService: TodoService
   ) {}
-
+  
+  ngOnInit() {
+    this.loadTodos();
+  }
+  
+  loadTodos() {
+    this.todoService.getTodos().subscribe({
+      next: (data) => this.todos.set(data),
+      error: () => this.snackBar.open('Failed to load todos', 'Close', { duration: 2000 })
+    });
+  }
+  
   openForm(todo?: Todo) {
     const dialogRef = this.dialog.open(TodoFormComponent, {
       width: '400px',
       data: todo || null
     });
-
+  
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         if (todo) {
-          this.todos.update(list =>
-            list.map(t =>
-              t.id === todo.id
-                ? {
-                    ...t,
-                    description: result.description,
-                    dueDate: result.dueDate,
-                    completed: t.completed,
-                    completionDate: t.completed
-                      ? t.completionDate ?? new Date().toISOString().split('T')[0]
-                      : undefined
-                  }
-                : t
-            )
-          );
+          // ✅ UPDATE on server
+          this.todoService.updateTodo(todo.id!, {
+            ...todo,
+            description: result.description,
+            dueDate: result.dueDate
+          }).subscribe({
+            next: (updated) => {
+              this.todos.update(list =>
+                list.map(t => t.id === updated.id ? updated : t)
+              );
+              this.snackBar.open('Todo updated', 'Close', { duration: 2000 });
+            },
+            error: () => this.snackBar.open('Failed to update todo', 'Close', { duration: 2000 })
+          });
         } else {
+          // ✅ CREATE on server
           const newTodo: Todo = {
-            id: crypto.randomUUID(),
             description: result.description,
             dueDate: result.dueDate,
-            creationDate: new Date().toISOString().split('T')[0],
+            creationDate: new Date().toISOString(),
             completed: false
           };
-
-          this.todos.update(list => [...list, newTodo]);
+  
+          this.todoService.createTodo(newTodo).subscribe({
+            next: (created) => {
+              this.todos.update(list => [...list, created]);
+              this.snackBar.open('New todo created', 'Close', { duration: 2000 });
+            },
+            error: () => this.snackBar.open('Failed to create todo', 'Close', { duration: 2000 })
+          });
         }
       }
     });
   }
-
+  
   delete(todo: Todo) {
-    this.todos.update(list => list.filter(t => t.id !== todo.id));
+    this.todoService.deleteTodo(todo.id!).subscribe({
+      next: () => {
+        this.todos.update(list => list.filter(t => t.id !== todo.id));
+        this.snackBar.open('Todo deleted', 'Close', { duration: 2000 });
+      },
+      error: () => this.snackBar.open('Failed to delete todo', 'Close', { duration: 2000 })
+    });
   }
-
+  
   deleteAllCompleted() {
-    this.todos.update(list => list.filter(todo => !todo.completed));
-  }
-
-  showMessage(message: string, isError = false) {
-    this.snackBar.open(message, 'Close', {
-      duration: 2500,
-      panelClass: isError ? ['snackbar-error'] : ['snackbar-success']
+    this.todoService.deleteAllCompleted(this.todos()).subscribe({
+      next: () => {
+        this.todos.update(list => list.filter(t => !t.completed));
+        this.snackBar.open('All completed todos deleted', 'Close', { duration: 2000 });
+      },
+      error: () => this.snackBar.open('Failed to delete completed todos', 'Close', { duration: 2000 })
     });
   }
 }
