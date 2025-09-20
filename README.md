@@ -1,27 +1,66 @@
 # Angular17TodoApp
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 17.3.17.
+A Todo List application built with Angular 17 and Angular Material.
+This project demonstrates the use of Angular’s newest features like Signals, the @if / @for template syntax, error handling with rollback, and a clean modular component structure.
+Todos are stored in a MockAPI backend, with full CRUD support.
 
-## Development server
+## Tech Stack
+* Angular 17 (standalone components + Signals API)
+* Angular Material (tabs, dialogs, buttons, icons, spinners)
+* RxJS for API and error handling
+* [MockAPI.io](https://mockapi.io/) as backend
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+## Features
+* Create / Edit / Delete todos
+* Mark todos as completed / active with automatic completion date
+* Due dates displayed alongside tasks
+* Loading states with Angular Material spinners
+* Empty states with friendly messages
+* Error handling with rollback when API calls fail
+* Modular components:
+  - TodoListComponent → main container
+  - TodoItemComponent → individual todo with checkbox, dates, actions
+  - TodoTabComponent → handles filtering (all, active, completed)
+  - TodoFormComponent → modal dialog for add/edit with validation
 
-## Code scaffolding
+## Getting Started
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+### Clone repository
+```
+git clone https://github.com/tania-boiar/angular17-todo-app.git
+cd angular17-todo-app
+```
 
-## Build
+### Install dependencies
+`npm install`
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+### Run dev server
+`ng serve`
 
-## Running unit tests
+👉 App will run at [http://localhost:4200](http://localhost:4200)
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+## API
+### Base URL
 
-## Running end-to-end tests
+[https://68cec39c6dc3f350777ff464.mockapi.io/api/v1/todos](https://68cec39c6dc3f350777ff464.mockapi.io/api/v1/todos)
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
 
-## Further help
+### Endpoints
+**GET** /todos → fetch all todos
+**GET** /todos/:id → fetch single todo
+**POST** /todos → create new todo
+**PUT** /todos/:id → update todo
+**DELETE** /todos/:id → delete todo
+**Bulk delete completed** → parallel delete requests
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+## API Documentation
+
+This project’s API is documented using **OpenAPI/Swagger**.
+- [Swagger Spec](./swagger.yaml)  
+- You can view and edit it online using [Swagger Editor](https://editor.swagger.io/).
+
+### Future Improvements
+🔑 Authentication
+📊 Pagination / infinite scroll
+🌙 Dark mode toggle
+🧪 Unit & e2e test coverage

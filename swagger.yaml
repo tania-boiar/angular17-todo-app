@@ -1,0 +1,120 @@
+openapi: 3.0.3
+info:
+  title: Angular 17 Todo App API
+  description: REST API for managing todos (MockAPI backend).
+  version: 1.0.0
+servers:
+  - url: https://68cec39c6dc3f350777ff464.mockapi.io/api/v1
+    description: MockAPI server
+
+paths:
+  /todos:
+    get:
+      summary: Get all todos
+      operationId: getTodos
+      responses:
+        '200':
+          description: A list of todos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Todo'
+    post:
+      summary: Create a new todo
+      operationId: createTodo
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Todo'
+      responses:
+        '201':
+          description: The created todo
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Todo'
+
+  /todos/{id}:
+    get:
+      summary: Get a todo by ID
+      operationId: getTodoById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A single todo
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Todo'
+    put:
+      summary: Update a todo
+      operationId: updateTodo
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Todo'
+      responses:
+        '200':
+          description: Updated todo
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Todo'
+    delete:
+      summary: Delete a todo
+      operationId: deleteTodo
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Todo deleted successfully
+
+components:
+  schemas:
+    Todo:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "1"
+        description:
+          type: string
+          example: "Buy groceries"
+        dueDate:
+          type: string
+          format: date-time
+          nullable: true
+          example: "2025-09-20T15:30:00.000Z"
+        creationDate:
+          type: string
+          format: date-time
+          example: "2025-09-19T12:00:00.000Z"
+        completed:
+          type: boolean
+          example: false
+        completionDate:
+          type: string
+          format: date-time
+          nullable: true
+          example: null
