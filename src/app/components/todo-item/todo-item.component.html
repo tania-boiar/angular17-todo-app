@@ -1,19 +1,21 @@
-<mat-list-item>
-  <mat-checkbox
-    [checked]="todo().completed"
-    (change)="onToggle(todo().id!, $event.checked)">
-    
-    <div class="content">
-      <div class="description">{{ todo().description }}</div>
+<mat-list-item class="todo-item">
+  <div class="main-row">
+    <mat-checkbox
+      [checked]="todo().completed"
+      (change)="onToggle(todo().id!, $event.checked)">
       
-      <div class="meta">
-        Created: {{ todo().creationDate | date:'mediumDate' }}
-        @if (todo().completed && todo().completionDate) {
-          • Completed: {{ todo().completionDate | date:'mediumDate' }}
-        }
+      <div class="content">
+        <div class="description">{{ todo().description }}</div>
+        
+        <div class="meta">
+          Created: {{ todo().creationDate | date:'mediumDate' }}
+          @if (todo().completed && todo().completionDate) {
+            • Completed: {{ todo().completionDate | date:'mediumDate' }}
+          }
+        </div>
       </div>
-    </div>
-  </mat-checkbox>
+    </mat-checkbox>
+  </div>
 
   <div matListItemMeta class="actions">
     <span class="due-date">
@@ -25,7 +27,7 @@
     <button mat-icon-button color="primary" (click)="onEdit()">
       <mat-icon>edit</mat-icon>
     </button>
-    
+
     <button mat-icon-button (click)="onDelete()">
       @if (todo().loading) {
         <mat-progress-spinner diameter="20" mode="indeterminate"></mat-progress-spinner>

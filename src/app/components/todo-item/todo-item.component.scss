@@ -1,23 +1,54 @@
-.meta {
-  font-size: 13px;
-  color: #666;
-  margin-top: 2px;
-}
-
-.actions {
+.todo-item {
   display: flex;
-  align-items: center;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-start;
   gap: 8px;
+
+  .content {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .description {
+    white-space: normal;
+    word-break: break-word;
+    font-size: 14px;
+  }
+
+  .meta {
+    color: #666;
+    font-size: 13px;
+    margin-top: 2px;
+  }
+
+  .actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .due-date {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: #555;
+    margin-right: 0.5rem;
+  }
+
+  @media (max-width: 600px) {
+    .due-date {
+      display: none;
+    }
+
+    .meta {
+      display: none;
+    }
+  }
 }
 
-.due-date {
-  font-size: 0.8rem;
-  font-weight: 500;
-  color: #555;
-  margin-right: 0.5rem;
-}
-
-.todo-text {
-  display: flex;
-  flex-direction: column;
+:host ::ng-deep .mdc-list-item__content {
+  white-space: normal;
+  overflow: visible;
+  text-overflow: unset;
+  align-self: flex-start;
 }
