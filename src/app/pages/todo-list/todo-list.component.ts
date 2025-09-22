@@ -1,4 +1,4 @@
-import { Component, computed, signal } from '@angular/core';
+import { Component, computed, signal, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatCardModule } from '@angular/material/card'; 
@@ -40,18 +40,16 @@ export class TodoListComponent {
   activeTodos = computed(() => this.todos().filter(todo => !todo.completed));
   loading = signal(false);
 
+  private dialog = inject(MatDialog);
+  private snackBar = inject(MatSnackBar);
+  private todoService = inject(TodoService);
+
   private replaceTodo(updated: Todo) {
     this.todos.update(list =>
       list.map(todo => todo.id === updated.id ? updated : todo)
     );
   }
 
-  constructor(
-    private dialog: MatDialog,
-    private snackBar: MatSnackBar,
-    private todoService: TodoService
-  ) {}
-  
   ngOnInit() {
     this.loadTodos();
   }
@@ -65,7 +63,6 @@ export class TodoListComponent {
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         if (todo) {
-          // ✅ UPDATE on server
           this.todoService.updateTodo(todo.id!, {
             ...todo,
             description: result.description,
@@ -78,7 +75,6 @@ export class TodoListComponent {
             error: () => this.snackBar.open('Failed to update todo', 'Close', { duration: 2000 })
           });
         } else {
-          // ✅ CREATE on server
           const newTodo: Todo = {
             description: result.description,
             dueDate: result.dueDate,
@@ -107,13 +103,12 @@ export class TodoListComponent {
   
     this.todoService.deleteTodo(todoToDelete.id!).subscribe({
       next: () => {
-        this.snackBar.open('Todo deleted ✅', 'Close', { duration: 2000 });
+        this.snackBar.open('Todo deleted', 'Close', { duration: 2000 });
       },
       error: () => {
-        // ❌ Rollback if API fails
         this.todos.set(prev);
   
-        this.snackBar.open('Failed to delete todo ❌', 'Retry', { duration: 3000 })
+        this.snackBar.open('Failed to delete todo', 'Retry', { duration: 3000 })
           .onAction()
           .subscribe(() => this.delete(todoToDelete));
       }
@@ -148,7 +143,7 @@ export class TodoListComponent {
       next: (saved) => this.replaceTodo(saved),
       error: () => {
         this.replaceTodo(current);
-        this.snackBar.open('Failed to update todo ❌', 'Close', { duration: 2000 });
+        this.snackBar.open('Failed to update todo', 'Close', { duration: 2000 });
       }
     });
   }

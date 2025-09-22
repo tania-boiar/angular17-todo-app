@@ -26,14 +26,10 @@ export class TodoTabComponent {
     const todos = this.todos();
     const filter = this.filter();
   
-    if (filter === 'active') {
-      return todos.filter(todo => !todo.completed);
-    }
+    if (filter === 'active') return todos.filter(todo => !todo.completed);
   
-    if (filter === 'completed') {
-      return todos.filter(todo => todo.completed);
-    }
-  
+    if (filter === 'completed') return todos.filter(todo => todo.completed);
+    
     return todos;
   });
 }

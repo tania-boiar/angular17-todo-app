@@ -1,4 +1,4 @@
-import { Component, Inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormBuilder, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -26,20 +26,20 @@ import { Todo } from '../../models/todo.model';
   styleUrls: ['./todo-form.component.scss']
 })
 export class TodoFormComponent {
+  private formBuilder = inject(FormBuilder);
+  private dialogRef = inject<MatDialogRef<TodoFormComponent, Todo>>(MatDialogRef);
+  data: Todo | null = inject(MAT_DIALOG_DATA);
+
   form = this.formBuilder.group({
     description: ['', [Validators.required, Validators.minLength(3)]],
     dueDate: [null as Date | null, Validators.required]
   });
-
-  constructor(
-    private formBuilder: FormBuilder,
-    private dialogRef: MatDialogRef<TodoFormComponent, Todo>,
-    @Inject(MAT_DIALOG_DATA) public data: Todo | null
-  ) {
-      if (data) {
+   
+  ngOnInit() {
+    if (this.data) {
       this.form.patchValue({
-        ...data,
-        dueDate: data.dueDate ? new Date(data.dueDate) : null
+        ...this.data,
+        dueDate: this.data.dueDate ? new Date(this.data.dueDate) : null
       });
     }
   }
@@ -51,7 +51,7 @@ export class TodoFormComponent {
       const todo: Todo = {
         id: this.data?.id,
         description: raw.description ?? '',
-        dueDate: raw.dueDate ? new Date(raw.dueDate).toISOString() : null, // ✅ convert back
+        dueDate: raw.dueDate ? new Date(raw.dueDate).toISOString() : null,
         creationDate: this.data?.creationDate ?? new Date().toISOString(),
         completed: this.data?.completed ?? false,
         completionDate: this.data?.completionDate ?? null
